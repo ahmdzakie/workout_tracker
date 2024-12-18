@@ -5,6 +5,7 @@ build/
 .packages
 .pub/
 .flutter-*
+.dart_tool/
 
 # IntelliJ related
 .idea/
