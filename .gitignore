@@ -1,0 +1,44 @@
+# Flutter related
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+.flutter-*
+
+# IntelliJ related
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/
+*.iml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/libraries
+.idea/shelf/
+.idea/spring.xml
+.idea/svn.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/misc.xml
+.idea/vcs.xml
+.idea/xml_data.xml
+.idea/libraries/*.xml
+
+# Visual Studio Code related
+.vscode/
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# General
+.DS_Store
+*.log
+*.pyc
+*.class
+*.tmp
+*.temp
+*.swp
+*~ 
+*#
