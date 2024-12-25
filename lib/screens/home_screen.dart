@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../data/repositories/workout_repository.dart';
+import '../data/repositories/mock_workout_repository.dart';
+import '../data/models/workout.dart';
+import 'day_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,7 +24,7 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              _buildTodayWorkout(),
+              _buildTodayWorkout(context),
               const SizedBox(height: 20),
               _buildProgressSection(),
               const SizedBox(height: 20),
@@ -32,33 +36,70 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTodayWorkout() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Today\'s Workout',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  Widget _buildTodayWorkout(BuildContext context) {
+    //TODO: Change the mockworkoutRepository with  actual repository
+    final WorkoutRepository repository = MockWorkoutRepository();
+    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final today = days[DateTime.now().weekday - 1];
+
+    return FutureBuilder<List<Workout>>(
+      future: repository.getWorkouts(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Card(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final todayWorkout = snapshot.data?.firstWhere(
+          (w) => w.dayOfWeek == today,
+          orElse: () => Workout(
+            id: '',
+            name: 'Rest Day',
+            description: 'No workout scheduled',
+            exercises: [],
+            date: DateTime.now(),
+            dayOfWeek: today,
+          ),
+        );
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Today\'s Workout ($today)',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                ListTile(
+                  leading: const Icon(Icons.fitness_center),
+                  title: Text(todayWorkout?.name ?? 'Rest Day'),
+                  subtitle: Text('${todayWorkout?.exercises.length ?? 0} exercises'),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DayDetailScreen(
+                            day: today,
+                            exercises: todayWorkout?.exercises ?? [],
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Start'),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            ListTile(
-              leading: const Icon(Icons.fitness_center),
-              title: const Text('Upper Body Strength'),
-              subtitle: const Text('45 minutes'),
-              trailing: ElevatedButton(
-                onPressed: () {},
-                child: const Text('Start'),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
-
   Widget _buildProgressSection() {
     return Card(
       child: Padding(
