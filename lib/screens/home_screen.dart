@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Text(
                   'Today\'s Workout ($today)',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 ListTile(
@@ -101,23 +101,23 @@ class HomeScreen extends StatelessWidget {
     );
   }
   Widget _buildProgressSection() {
-    return Card(
+    return const Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Weekly Progress',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
-            const LinearProgressIndicator(
+            SizedBox(height: 10),
+            LinearProgressIndicator(
               value: 0.7,
               minHeight: 10,
             ),
-            const SizedBox(height: 10),
-            const Text('5 out of 7 workouts completed'),
+            SizedBox(height: 10),
+            Text('5 out of 7 workouts completed'),
           ],
         ),
       ),

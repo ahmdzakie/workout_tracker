@@ -43,11 +43,11 @@ class _PlansScreenState extends State<PlansScreen> {
           elevation: 0,
           backgroundColor: Colors.white,
           foregroundColor: Colors.black87,
-          title: Text(
+          title: const Text(
             'Workout Plans',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          bottom: TabBar(
+          bottom: const TabBar(
             labelColor: Colors.blue,
             unselectedLabelColor: Colors.grey,
             indicatorColor: Colors.blue,
@@ -58,7 +58,7 @@ class _PlansScreenState extends State<PlansScreen> {
           ),
         ),
         body: isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : TabBarView(
                 children: [
                   _buildCurrentPlan(context),
@@ -90,7 +90,7 @@ class _PlansScreenState extends State<PlansScreen> {
         );
 
         return Container(
-          margin: EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -98,15 +98,15 @@ class _PlansScreenState extends State<PlansScreen> {
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 10,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           child: ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             title: Text(
               day,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -120,8 +120,8 @@ class _PlansScreenState extends State<PlansScreen> {
                 color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              padding: EdgeInsets.all(8),
-              child: Icon(
+              padding: const EdgeInsets.all(8),
+              child: const Icon(
                 Icons.arrow_forward_ios,
                 color: Colors.blue,
                 size: 16,

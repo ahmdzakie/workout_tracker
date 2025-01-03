@@ -4,6 +4,8 @@ import '../data/repositories/workout_repository.dart';
 import '../data/repositories/mock_workout_repository.dart';
 import '../widgets/workout_card.dart';  // Assuming you have this widget
 class WorkoutListScreen extends StatefulWidget {
+  const WorkoutListScreen({super.key});
+
   @override
   _WorkoutListScreenState createState() => _WorkoutListScreenState();
 }
@@ -33,7 +35,7 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
     return ListView.builder(

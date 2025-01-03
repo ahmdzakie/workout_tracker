@@ -31,19 +31,19 @@ class MockWorkoutRepository implements WorkoutRepository {
   @override
   Future<List<Workout>> getWorkouts() async {
     // Simulate network delay
-    await Future.delayed(Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 800));
     return _mockWorkouts;
   }
 
   @override
   Future<Workout> getWorkoutById(String id) async {
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     return _mockWorkouts.firstWhere((workout) => workout.id == id);
   }
 
   @override
   Future<List<Workout>> getWorkoutsByDate(DateTime date) async {
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     return _mockWorkouts.where((workout) =>
       workout.date.year == date.year &&
       workout.date.month == date.month &&
