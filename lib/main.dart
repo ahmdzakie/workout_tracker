@@ -4,6 +4,7 @@ import 'screens/home_screen.dart';
 import 'screens/plans_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/contact_screen.dart';
+import 'screens/onboarding/onboarding_wizard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +34,12 @@ class WorkoutTrackerApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      // Replace home with initialRoute
+      initialRoute: '/onboarding',
+      routes: {
+        '/onboarding': (context) => const OnboardingWizard(),
+        '/main': (context) => const MainScreen(),
+      },
     );
   }
 }
