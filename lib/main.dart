@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:workout_tracker/services/service_locator.dart';
 import 'screens/home_screen.dart';
 import 'screens/plans_screen.dart';
 import 'screens/profile_screen.dart';
@@ -12,6 +13,7 @@ void main() async {
   // Precache your fonts
   await precacheFonts();
 
+  setupServiceLocator();
   runApp(const WorkoutTrackerApp());
 }
 
