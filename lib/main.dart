@@ -35,7 +35,7 @@ class WorkoutTrackerApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // Replace home with initialRoute
-      initialRoute: '/onboarding',
+      initialRoute: '/main',
       routes: {
         '/onboarding': (context) => const OnboardingWizard(),
         '/main': (context) => const MainScreen(),

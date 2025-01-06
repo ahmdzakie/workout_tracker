@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/repositories/workout_plan_repository.dart';
+import 'package:workout_tracker/repositories/workout_plan_repository_impl.dart';
 import '../data/models/workout.dart';
 import '../data/repositories/workout_repository.dart';
 import '../data/repositories/mock_workout_repository.dart';
+import '../models/workout_plan.dart';
+import '../services/api/workout_plan_api_client.dart';
 import 'day_detail_screen.dart';
 
 class PlansScreen extends StatefulWidget {
@@ -14,20 +18,21 @@ class PlansScreen extends StatefulWidget {
 class _PlansScreenState extends State<PlansScreen> {
   final WorkoutRepository repository = MockWorkoutRepository();
   List<Workout> workouts = [];
+  final WorkoutPlanRepository workoutPlanRepository =
+      WorkoutPlanRepositoryImpl(WorkoutPlanApiClient());
+  WorkoutPlan? currentPlan;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    loadWorkouts();
+    loadWorkoutPlan();
   }
 
-  Future<void> loadWorkouts() async {
+  Future<void> loadWorkoutPlan() async {
     setState(() => isLoading = true);
     try {
-      print('Starting to load workouts');
-      workouts = await repository.getWorkouts();
-      print('Loaded ${workouts.length} workouts');
+      currentPlan = await workoutPlanRepository.getCurrentPlan();
     } finally {
       setState(() => isLoading = false);
     }
@@ -70,24 +75,15 @@ class _PlansScreenState extends State<PlansScreen> {
   }
 
   Widget _buildCurrentPlan(BuildContext context) {
-    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    if (currentPlan == null) {
+      return const Center(child: Text('No workout plan available'));
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: days.length,
+      itemCount: currentPlan!.getAllPlanDays().length,
       itemBuilder: (context, index) {
-        final day = days[index];
-        final dayWorkout = workouts.firstWhere(
-          (w) => w.dayOfWeek == day,
-          orElse: () => Workout(
-            id: '',
-            name: '',
-            description: '',
-            exercises: [],
-            date: DateTime.now(),
-            dayOfWeek: day,
-          ),
-        );
+        final dayPlan = currentPlan!.getAllPlanDays()[index];
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -103,16 +99,17 @@ class _PlansScreenState extends State<PlansScreen> {
             ],
           ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             title: Text(
-              day,
+              dayPlan.name,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             subtitle: Text(
-              '${dayWorkout.exercises.length} exercises',
+              '${dayPlan.exercises.length} exercises',
               style: TextStyle(color: Colors.grey[600]),
             ),
             trailing: Container(
@@ -131,10 +128,7 @@ class _PlansScreenState extends State<PlansScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DayDetailScreen(
-                    day: day,
-                    exercises: dayWorkout.exercises,
-                  ),
+                  builder: (context) => DayDetailScreen(dayPlan: dayPlan),
                 ),
               );
             },
@@ -143,6 +137,7 @@ class _PlansScreenState extends State<PlansScreen> {
       },
     );
   }
+
   Widget _buildPreviousPlans() {
     return ListView.builder(
       padding: const EdgeInsets.all(16),

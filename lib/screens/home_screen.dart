@@ -80,15 +80,15 @@ class HomeScreen extends StatelessWidget {
                   subtitle: Text('${todayWorkout?.exercises.length ?? 0} exercises'),
                   trailing: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DayDetailScreen(
-                            day: today,
-                            exercises: todayWorkout?.exercises ?? [],
-                          ),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => DayDetailScreen(
+                      //       day: today,
+                      //       exercises: todayWorkout?.exercises ?? [],
+                      //     ),
+                      //   ),
+                      // );
                     },
                     child: const Text('Start'),
                   ),
