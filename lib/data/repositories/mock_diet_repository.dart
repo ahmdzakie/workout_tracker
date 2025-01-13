@@ -1,5 +1,6 @@
 import '../models/diet_plan.dart';
 import 'diet_repository.dart';
+
 class MockDietRepository implements DietRepository {
   final DietPlan _mockDietPlan = DietPlan(
     id: 123,
@@ -44,5 +45,3 @@ class MockDietRepository implements DietRepository {
     return _mockDietPlan;
   }
 }
-
-

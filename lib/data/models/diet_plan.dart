@@ -51,7 +51,8 @@ class DietDay {
 
   factory DietDay.fromJson(Map<String, dynamic> json) {
     return DietDay(
-      meals: (json['meals'] as List).map((meal) => Meal.fromJson(meal)).toList(),
+      meals:
+          (json['meals'] as List).map((meal) => Meal.fromJson(meal)).toList(),
     );
   }
 }
@@ -71,7 +72,9 @@ class Meal {
     return Meal(
       name: json['name'],
       time: json['time'],
-      items: (json['items'] as List).map((item) => MealItem.fromJson(item)).toList(),
+      items: (json['items'] as List)
+          .map((item) => MealItem.fromJson(item))
+          .toList(),
     );
   }
 }

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/repositories/workout_plan_repository.dart';
-import 'package:workout_tracker/repositories/workout_plan_repository_impl.dart';
-import '../data/models/workout.dart';
-import '../data/repositories/workout_repository.dart';
-import '../data/repositories/mock_workout_repository.dart';
 import '../models/workout_plan.dart';
-import '../services/api/workout_plan_api_client.dart';
+import '../repositories/workout_plan_repository.dart';
+import '../repositories/mock_workout_plan_repository.dart';
 import 'day_detail_screen.dart';
 
 class PlansScreen extends StatefulWidget {
@@ -16,25 +12,28 @@ class PlansScreen extends StatefulWidget {
 }
 
 class _PlansScreenState extends State<PlansScreen> {
-  final WorkoutRepository repository = MockWorkoutRepository();
-  List<Workout> workouts = [];
-  final WorkoutPlanRepository workoutPlanRepository =
-      WorkoutPlanRepositoryImpl(WorkoutPlanApiClient());
+  final WorkoutPlanRepository workoutPlanRepository = MockWorkoutPlanRepository();
   WorkoutPlan? currentPlan;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    loadWorkoutPlan();
+    _loadCurrentPlan();
   }
 
-  Future<void> loadWorkoutPlan() async {
-    setState(() => isLoading = true);
+  Future<void> _loadCurrentPlan() async {
     try {
-      currentPlan = await workoutPlanRepository.getCurrentPlan();
-    } finally {
-      setState(() => isLoading = false);
+      final plan = await workoutPlanRepository.getCurrentPlan();
+      setState(() {
+        currentPlan = plan;
+        isLoading = false;
+      });
+    } on Exception catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error loading plan: $error');
     }
   }
 
@@ -44,39 +43,52 @@ class _PlansScreenState extends State<PlansScreen> {
       length: 2,
       child: Scaffold(
         backgroundColor: Colors.grey[100],
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
-          title: const Text(
-            'Workout Plans',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          bottom: const TabBar(
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Colors.blue,
-            tabs: [
-              Tab(text: 'CURRENT PLAN'),
-              Tab(text: 'PREVIOUS PLANS'),
-            ],
-          ),
-        ),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : TabBarView(
-                children: [
-                  _buildCurrentPlan(context),
-                  _buildPreviousPlans(),
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              expandedHeight: 200.0,
+              floating: false,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: const Text('Workout Plans'),
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.blue[400]!,
+                        Colors.blue[800]!,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              bottom: const TabBar(
+                indicatorColor: Colors.white,
+                tabs: [
+                  Tab(text: 'CURRENT PLAN'),
+                  Tab(text: 'PREVIOUS PLANS'),
                 ],
               ),
+            ),
+          ],
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : TabBarView(
+                  children: [
+                    _buildCurrentPlan(),
+                    _buildPreviousPlans(),
+                  ],
+                ),
+        ),
       ),
     );
   }
 
-  Widget _buildCurrentPlan(BuildContext context) {
+  Widget _buildCurrentPlan() {
     if (currentPlan == null) {
-      return const Center(child: Text('No workout plan available'));
+      return _buildEmptyState();
     }
 
     return ListView.builder(
@@ -84,12 +96,145 @@ class _PlansScreenState extends State<PlansScreen> {
       itemCount: currentPlan!.getAllPlanDays().length,
       itemBuilder: (context, index) {
         final dayPlan = currentPlan!.getAllPlanDays()[index];
+        return _buildDayCard(dayPlan);
+      },
+    );
+  }
 
+  Widget _buildDayCard(DayPlan dayPlan) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DayDetailScreen(dayPlan: dayPlan),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.fitness_center,
+                          color: Colors.blue[400],
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              dayPlan.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${dayPlan.exercises.length} exercises',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[400],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (dayPlan.exercises.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    _buildExercisePreview(dayPlan),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExercisePreview(DayPlan dayPlan) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: dayPlan.exercises
+            .take(2)
+            .map((exercise) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.circle, size: 8, color: Colors.blue[400]),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${exercise.sets} sets × ${exercise.reps} reps',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ))
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildPreviousPlans() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 3,
+      itemBuilder: (context, index) {
         return Container(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -99,38 +244,28 @@ class _PlansScreenState extends State<PlansScreen> {
             ],
           ),
           child: ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding: const EdgeInsets.all(20),
+            leading: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.history, color: Colors.grey[600]),
+            ),
             title: Text(
-              dayPlan.name,
+              'Previous Plan ${index + 1}',
               style: const TextStyle(
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             subtitle: Text(
-              '${dayPlan.exercises.length} exercises',
+              'Completed: ${2023 - index}',
               style: TextStyle(color: Colors.grey[600]),
             ),
-            trailing: Container(
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.all(8),
-              child: const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.blue,
-                size: 16,
-              ),
-            ),
+            trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DayDetailScreen(dayPlan: dayPlan),
-                ),
-              );
+              // Navigate to historical plan view
             },
           ),
         );
@@ -138,22 +273,26 @@ class _PlansScreenState extends State<PlansScreen> {
     );
   }
 
-  Widget _buildPreviousPlans() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Card(
-          child: ListTile(
-            title: Text('Previous Plan ${index + 1}'),
-            subtitle: Text('Completed: ${2023 - index}'),
-            trailing: const Icon(Icons.history),
-            onTap: () {
-              // Navigate to historical plan view
-            },
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.fitness_center,
+            size: 64,
+            color: Colors.grey[400],
           ),
-        );
-      },
+          const SizedBox(height: 16),
+          Text(
+            'No workout plan available',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

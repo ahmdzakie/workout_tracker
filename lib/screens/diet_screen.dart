@@ -25,6 +25,7 @@ class _DietScreenState extends State<DietScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       body: FutureBuilder<DietPlan>(
         future: _dietPlan,
         builder: (context, snapshot) {
@@ -33,12 +34,18 @@ class _DietScreenState extends State<DietScreen> {
               slivers: [
                 _buildSliverAppBar(snapshot.data!),
                 SliverToBoxAdapter(
-                  child: _buildMacroStats(snapshot.data!),
+                  child: Column(
+                    children: [
+                      _buildCalorieCard(snapshot.data!),
+                      _buildMacroStats(snapshot.data!),
+                    ],
+                  ),
                 ),
                 _buildMealsList(snapshot.data!),
               ],
             );
-          } else if (snapshot.hasError) {
+          }
+          if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           return const Center(child: CircularProgressIndicator());
@@ -57,83 +64,147 @@ class _DietScreenState extends State<DietScreen> {
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
-                Theme.of(context).primaryColor,
-                Theme.of(context).primaryColor.withOpacity(0.7),
-              ],
-            ),
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 40),
-                Text(
-                  '${plan.targetCalories}',
-                  style: const TextStyle(
-                    fontSize: 40,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Daily Calories',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
-                  ),
-                ),
+                Colors.green[400]!,
+                Colors.green[700]!,
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCalorieCard(DietPlan plan) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.green[400]!, Colors.green[600]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const Text(
+            'Daily Calorie Target',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${plan.targetCalories}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Text(
+            'calories',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildMacroStats(DietPlan plan) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildMacroCard('Protein', plan.targetMacros.protein, Colors.red),
-          _buildMacroCard('Carbs', plan.targetMacros.carbs, Colors.green),
-          _buildMacroCard('Fats', plan.targetMacros.fats, Colors.blue),
+          _buildMacroIndicator(
+            'Protein',
+            plan.targetMacros.protein,
+            Colors.red[400]!,
+          ),
+          _buildMacroIndicator(
+            'Carbs',
+            plan.targetMacros.carbs,
+            Colors.green[400]!,
+          ),
+          _buildMacroIndicator(
+            'Fats',
+            plan.targetMacros.fats,
+            Colors.blue[400]!,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMacroCard(String title, int value, Color color) {
-    return Card(
-      elevation: 4,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        width: 100,
-        child: Column(
-          children: [
-            Text(
-              '$value g',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: color,
+  Widget _buildMacroIndicator(String label, int value, Color color) {
+    return Column(
+      children: [
+        SizedBox(
+          width: 80,
+          height: 80,
+          child: Stack(
+            children: [
+              Center(
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(
+                    value: 0.7, //TODO: need to change this value
+                    strokeWidth: 8,
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
+              Center(
+                child: Text(
+                  '${value}g',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 
@@ -142,21 +213,30 @@ class _DietScreenState extends State<DietScreen> {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final meal = plan.days[0].meals[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            elevation: 2,
+          return Container(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               leading: Container(
-                width: 48,
-                height: 48,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: Colors.green[50],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   _getMealIcon(meal.name),
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.green[400],
                 ),
               ),
               title: Text(
@@ -168,19 +248,28 @@ class _DietScreenState extends State<DietScreen> {
               ),
               subtitle: Text(
                 meal.time,
-                style: const TextStyle(
-                  color: Colors.grey,
+                style: TextStyle(
+                  color: Colors.grey[600],
                 ),
               ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MealDetailsScreen(meal: meal),
-                  ),
-                );
-              },
+              trailing: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green[400],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.arrow_forward,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MealDetailsScreen(meal: meal),
+                ),
+              ),
             ),
           );
         },

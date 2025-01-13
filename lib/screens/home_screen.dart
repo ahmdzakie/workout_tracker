@@ -10,155 +10,363 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Workout Tracker'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Welcome back!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: Colors.grey[100],
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            _buildAppBar(),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildWelcomeSection(),
+                    const SizedBox(height: 25),
+                    _buildDailyGoalCard(),
+                    const SizedBox(height: 25),
+                    _buildTodayWorkout(context),
+                    const SizedBox(height: 25),
+                    _buildNutritionOverview(),
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
-              _buildTodayWorkout(context),
-              const SizedBox(height: 20),
-              _buildProgressSection(),
-              const SizedBox(height: 20),
-              _buildQuickActions(),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      floating: true,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: CircleAvatar(
+        backgroundColor: Colors.blue[100],
+        child: const Icon(Icons.person, color: Colors.blue),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.notifications_outlined, color: Colors.black),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Welcome back, Alex!',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Let\'s check your progress',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDailyGoalCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue[400]!, Colors.blue[600]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Daily Goals',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildGoalItem(
+                icon: Icons.local_fire_department,
+                value: '850',
+                unit: 'kcal',
+                progress: 0.7,
+              ),
+              _buildGoalItem(
+                icon: Icons.fitness_center,
+                value: '4/6',
+                unit: 'exercises',
+                progress: 0.65,
+              ),
+              _buildGoalItem(
+                icon: Icons.water_drop,
+                value: '1.5',
+                unit: 'liters',
+                progress: 0.5,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoalItem({
+    required IconData icon,
+    required String value,
+    required String unit,
+    required double progress,
+  }) {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(
+                value: progress,
+                backgroundColor: Colors.white24,
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                strokeWidth: 3,
+              ),
+            ),
+            Icon(icon, color: Colors.white, size: 24),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          unit,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildTodayWorkout(BuildContext context) {
-    //TODO: Change the mockworkoutRepository with  actual repository
-    final WorkoutRepository repository = MockWorkoutRepository();
-    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    final today = days[DateTime.now().weekday - 1];
-
-    return FutureBuilder<List<Workout>>(
-      future: repository.getWorkouts(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Card(
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        final todayWorkout = snapshot.data?.firstWhere(
-          (w) => w.dayOfWeek == today,
-          orElse: () => Workout(
-            id: '',
-            name: 'Rest Day',
-            description: 'No workout scheduled',
-            exercises: [],
-            date: DateTime.now(),
-            dayOfWeek: today,
-          ),
-        );
-
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Today\'s Workout ($today)',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                ListTile(
-                  leading: const Icon(Icons.fitness_center),
-                  title: Text(todayWorkout?.name ?? 'Rest Day'),
-                  subtitle: Text('${todayWorkout?.exercises.length ?? 0} exercises'),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => DayDetailScreen(
-                      //       day: today,
-                      //       exercises: todayWorkout?.exercises ?? [],
-                      //     ),
-                      //   ),
-                      // );
-                    },
-                    child: const Text('Start'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-  Widget _buildProgressSection() {
-    return const Card(
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Weekly Progress',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: 0.7,
-              minHeight: 10,
-            ),
-            SizedBox(height: 10),
-            Text('5 out of 7 workouts completed'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActions() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Quick Actions',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'Today\'s Workout',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildActionButton(Icons.calendar_today, 'Schedule'),
-                _buildActionButton(Icons.history, 'History'),
-                _buildActionButton(Icons.insights, 'Stats'),
-              ],
+            TextButton(
+              onPressed: () {},
+              child: const Text('View Plan'),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 15),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.fitness_center,
+                      color: Colors.blue[400],
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Upper Body Strength',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '8 exercises · 40 min',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Start'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label) {
+  Widget _buildNutritionOverview() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Nutrition Overview',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNutrientProgress(
+                nutrient: 'Protein',
+                current: 65,
+                target: 120,
+                color: Colors.red[400]!,
+              ),
+              _buildNutrientProgress(
+                nutrient: 'Carbs',
+                current: 180,
+                target: 240,
+                color: Colors.green[400]!,
+              ),
+              _buildNutrientProgress(
+                nutrient: 'Fats',
+                current: 45,
+                target: 60,
+                color: Colors.blue[400]!,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNutrientProgress({
+    required String nutrient,
+    required int current,
+    required int target,
+    required Color color,
+  }) {
+    final progress = current / target;
     return Column(
       children: [
-        IconButton(
-          icon: Icon(icon),
-          onPressed: () {},
-          iconSize: 30,
+        SizedBox(
+          width: 60,
+          height: 60,
+          child: Stack(
+            children: [
+              CircularProgressIndicator(
+                value: progress,
+                backgroundColor: Colors.grey[200],
+                valueColor: AlwaysStoppedAnimation<Color>(color),
+                strokeWidth: 8,
+              ),
+              Center(
+                child: Text(
+                  '${(progress * 100).round()}%',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        Text(label),
+        const SizedBox(height: 8),
+        Text(
+          nutrient,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          '$current/$target g',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
       ],
     );
   }
