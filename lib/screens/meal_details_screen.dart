@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import '../data/models/diet_plan.dart';
 
@@ -11,19 +12,21 @@ class MealDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           _buildSliverAppBar(context),
           SliverToBoxAdapter(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildMealOverview(),
                 _buildNutritionCard(),
-                const Padding(
-                  padding: EdgeInsets.all(20.0),
+                Padding(
+                  padding: const EdgeInsets.all(20),
                   child: Text(
                     'Food Items',
-                    style: TextStyle(
-                      fontSize: 20,
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -42,25 +45,51 @@ class MealDetailsScreen extends StatelessWidget {
       expandedHeight: 200.0,
       floating: false,
       pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
-        title: Text(meal.name),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.green[400]!,
-                Colors.green[700]!,
-              ],
+      backgroundColor: Colors.transparent,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.green[400]!,
+              Colors.green[700]!,
+            ],
+          ),
+        ),
+        child: FlexibleSpaceBar(
+          title: Text(
+            meal.name,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
             ),
           ),
-          child: Center(
-            child: Icon(
-              _getMealIcon(meal.name),
-              size: 80,
-              color: Colors.white.withOpacity(0.7),
-            ),
+          background: Stack(
+            children: [
+              Center(
+                child: Icon(
+                  _getMealIcon(meal.name),
+                  size: 80,
+                  color: Colors.white.withOpacity(0.7),
+                ),
+              ),
+              Positioned(
+                right: -50,
+                top: -50,
+                child: CircleAvatar(
+                  radius: 100,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                ),
+              ),
+              Positioned(
+                left: -30,
+                bottom: -30,
+                child: CircleAvatar(
+                  radius: 80,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -70,46 +99,47 @@ class MealDetailsScreen extends StatelessWidget {
   Widget _buildMealOverview() {
     return Container(
       margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: Colors.green[50],
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
               Icons.schedule,
               color: Colors.green[400],
+              size: 30,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Scheduled Time',
-                style: TextStyle(
-                  color: Colors.grey,
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[600],
                   fontSize: 14,
                 ),
               ),
               Text(
                 meal.time,
-                style: const TextStyle(
-                  fontSize: 18,
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -123,25 +153,37 @@ class MealDetailsScreen extends StatelessWidget {
   Widget _buildNutritionCard() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Column(
         children: [
-          _buildNutrientInfo('Calories', '500', 'kcal', Colors.orange),
-          _buildNutrientInfo('Protein', '30', 'g', Colors.red),
-          _buildNutrientInfo('Carbs', '10', 'g', Colors.green),
-          _buildNutrientInfo('Fats', '15', 'g', Colors.blue),
+          Text(
+            'Nutrition Facts',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNutrientInfo('Calories', '500', 'kcal', Colors.orange),
+              _buildNutrientInfo('Protein', '30', 'g', Colors.red),
+              _buildNutrientInfo('Carbs', '15', 'g', Colors.green),
+              _buildNutrientInfo('Fats', '10', 'g', Colors.blue),
+            ],
+          ),
         ],
       ),
     );
@@ -151,27 +193,38 @@ class MealDetailsScreen extends StatelessWidget {
       String label, String value, String unit, Color color) {
     return Column(
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
+        Container(
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              Text(
+                value,
+                style: GoogleFonts.poppins(
+                  color: color,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                unit,
+                style: GoogleFonts.poppins(
+                  color: color,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          value,
-          style: TextStyle(
-            color: color,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          unit,
-          style: TextStyle(
+          label,
+          style: GoogleFonts.poppins(
             color: Colors.grey[600],
-            fontSize: 12,
+            fontSize: 14,
           ),
         ),
       ],
@@ -183,51 +236,96 @@ class MealDetailsScreen extends StatelessWidget {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final item = meal.items[index];
-          return _buildFoodItemCard(item);
+          return _buildFoodItemCard(item, context);
         },
         childCount: meal.items.length,
       ),
     );
   }
 
-  Widget _buildFoodItemCard(MealItem item) {
+  Widget _buildFoodItemCard(MealItem item, BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: ExpansionTile(
-        title: Text(
-          'Food Item ${item.alternatives.first.foodId}',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        children: item.alternatives.map((alternative) {
-          return ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.restaurant,
-                color: Colors.green[400],
-              ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          childrenPadding: const EdgeInsets.all(20),
+          leading: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              borderRadius: BorderRadius.circular(20),
             ),
-            title: Text('Alternative ${alternative.foodId}'),
-            subtitle: Text('${alternative.serving}g'),
-          );
-        }).toList(),
+            child: Icon(
+              Icons.restaurant,
+              color: Colors.green[400],
+            ),
+          ),
+          title: Text(
+            'Food Item ${item.alternatives.first.foodId}',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          children: item.alternatives.map((alternative) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Icon(
+                      Icons.restaurant_menu,
+                      color: Colors.green[400],
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Alternative ${alternative.foodId}',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '${alternative.serving}g',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

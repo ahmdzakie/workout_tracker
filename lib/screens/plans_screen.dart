@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/workout_plan.dart';
 import '../repositories/workout_plan_repository.dart';
 import '../repositories/mock_workout_plan_repository.dart';
@@ -12,7 +13,8 @@ class PlansScreen extends StatefulWidget {
 }
 
 class _PlansScreenState extends State<PlansScreen> {
-  final WorkoutPlanRepository workoutPlanRepository = MockWorkoutPlanRepository();
+  final WorkoutPlanRepository workoutPlanRepository =
+      MockWorkoutPlanRepository();
   WorkoutPlan? currentPlan;
   bool isLoading = true;
 
@@ -44,29 +46,63 @@ class _PlansScreenState extends State<PlansScreen> {
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         body: NestedScrollView(
+          physics: const BouncingScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverAppBar(
               expandedHeight: 200.0,
               floating: false,
               pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                title: const Text('Workout Plans'),
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.blue[400]!,
-                        Colors.blue[800]!,
-                      ],
+              backgroundColor: Colors.transparent,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.blue[400]!,
+                      Colors.blue[800]!,
+                    ],
+                  ),
+                ),
+                child: FlexibleSpaceBar(
+                  centerTitle: false,
+                  titlePadding: const EdgeInsets.only(left: 20, bottom: 60),
+                  title: Text(
+                    'Workout Plans',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
                     ),
+                  ),
+                  background: Stack(
+                    children: [
+                      Positioned(
+                        right: -50,
+                        top: -50,
+                        child: CircleAvatar(
+                          radius: 100,
+                          backgroundColor: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                      Positioned(
+                        left: -30,
+                        bottom: -30,
+                        child: CircleAvatar(
+                          radius: 80,
+                          backgroundColor: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              bottom: const TabBar(
+              bottom: TabBar(
                 indicatorColor: Colors.white,
-                tabs: [
+                indicatorWeight: 3,
+                labelStyle: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                ),
+                tabs: const [
                   Tab(text: 'CURRENT PLAN'),
                   Tab(text: 'PREVIOUS PLANS'),
                 ],
@@ -92,7 +128,8 @@ class _PlansScreenState extends State<PlansScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      physics: const BouncingScrollPhysics(),
       itemCount: currentPlan!.getAllPlanDays().length,
       itemBuilder: (context, index) {
         final dayPlan = currentPlan!.getAllPlanDays()[index];
@@ -103,20 +140,20 @@ class _PlansScreenState extends State<PlansScreen> {
 
   Widget _buildDayCard(DayPlan dayPlan) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -134,32 +171,32 @@ class _PlansScreenState extends State<PlansScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Icon(
                           Icons.fitness_center,
                           color: Colors.blue[400],
-                          size: 24,
+                          size: 30,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 15),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               dayPlan.name,
-                              style: const TextStyle(
-                                fontSize: 18,
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               '${dayPlan.exercises.length} exercises',
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 color: Colors.grey[600],
                                 fontSize: 14,
                               ),
@@ -168,10 +205,10 @@ class _PlansScreenState extends State<PlansScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.blue[400],
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         child: const Icon(
                           Icons.arrow_forward,
@@ -182,7 +219,7 @@ class _PlansScreenState extends State<PlansScreen> {
                     ],
                   ),
                   if (dayPlan.exercises.isNotEmpty) ...[
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     _buildExercisePreview(dayPlan),
                   ],
                 ],
@@ -196,25 +233,36 @@ class _PlansScreenState extends State<PlansScreen> {
 
   Widget _buildExercisePreview(DayPlan dayPlan) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: dayPlan.exercises
             .take(2)
             .map((exercise) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Row(
                     children: [
-                      Icon(Icons.circle, size: 8, color: Colors.blue[400]),
-                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[100],
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.fitness_center,
+                          size: 12,
+                          color: Colors.blue[700],
+                        ),
+                      ),
+                      const SizedBox(width: 15),
                       Text(
                         '${exercise.sets} sets × ${exercise.reps} reps',
-                        style: const TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: Colors.grey[700],
                         ),
                       ),
                     ],
@@ -227,46 +275,63 @@ class _PlansScreenState extends State<PlansScreen> {
 
   Widget _buildPreviousPlans() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      physics: const BouncingScrollPhysics(),
       itemCount: 3,
       itemBuilder: (context, index) {
         return Container(
-          margin: const EdgeInsets.only(bottom: 16),
+          margin: const EdgeInsets.only(bottom: 20),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 10,
-                offset: const Offset(0, 4),
+                offset: const Offset(0, 5),
               ),
             ],
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.all(20),
             leading: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(Icons.history, color: Colors.grey[600]),
+              child: Icon(
+                Icons.history,
+                color: Colors.grey[600],
+                size: 30,
+              ),
             ),
             title: Text(
               'Previous Plan ${index + 1}',
-              style: const TextStyle(
+              style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
             subtitle: Text(
               'Completed: ${2023 - index}',
-              style: TextStyle(color: Colors.grey[600]),
+              style: GoogleFonts.poppins(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
-            trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
-            onTap: () {
-              // Navigate to historical plan view
-            },
+            trailing: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(
+                Icons.arrow_forward,
+                color: Colors.grey[600],
+                size: 20,
+              ),
+            ),
           ),
         );
       },
@@ -280,13 +345,13 @@ class _PlansScreenState extends State<PlansScreen> {
         children: [
           Icon(
             Icons.fitness_center,
-            size: 64,
+            size: 80,
             color: Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             'No workout plan available',
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               color: Colors.grey[600],
               fontSize: 16,
             ),

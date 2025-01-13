@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../data/repositories/workout_repository.dart';
-import '../data/repositories/mock_workout_repository.dart';
-import '../data/models/workout.dart';
-import 'day_detail_screen.dart';
+
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,23 +11,17 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
           slivers: [
-            _buildAppBar(),
+            _buildHeader(),
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildWelcomeSection(),
-                    const SizedBox(height: 25),
-                    _buildDailyGoalCard(),
-                    const SizedBox(height: 25),
-                    _buildTodayWorkout(context),
-                    const SizedBox(height: 25),
-                    _buildNutritionOverview(),
-                  ],
-                ),
+              child: Column(
+                children: [
+                  _buildActivityStats(),
+                  _buildDailyGoals(),
+                  _buildTodayWorkout(context),
+                  //_buildQuickStats(),
+                ],
               ),
             ),
           ],
@@ -38,136 +30,223 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar() {
-    return SliverAppBar(
-      floating: true,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: CircleAvatar(
-        backgroundColor: Colors.blue[100],
-        child: const Icon(Icons.person, color: Colors.blue),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWelcomeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Welcome back, Alex!',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Let\'s check your progress',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDailyGoalCard() {
-    return Container(
+  Widget _buildHeader() {
+    return SliverPadding(
       padding: const EdgeInsets.all(20),
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hi, Alex 👋',
+                      style: GoogleFonts.poppins(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Let\'s check your activity',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blue[400]!, Colors.blue[600]!],
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.person, color: Colors.white),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivityStats() {
+    return Container(
+      height: 120,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: ListView(
+        physics: const BouncingScrollPhysics(),
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        children: [
+          _buildStatCard('Workouts\nCompleted', '12', Colors.blue),
+          _buildStatCard('Calories\nBurned', '840', Colors.orange),
+          _buildStatCard('Minutes\nExercised', '160', Colors.purple),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String label, String value, Color color) {
+    return Container(
+      width: 140,
+      margin: const EdgeInsets.only(right: 15),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue[400]!, Colors.blue[600]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(0.7),
+            color,
+          ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Daily Goals',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildGoalItem(
-                icon: Icons.local_fire_department,
-                value: '850',
-                unit: 'kcal',
-                progress: 0.7,
-              ),
-              _buildGoalItem(
-                icon: Icons.fitness_center,
-                value: '4/6',
-                unit: 'exercises',
-                progress: 0.65,
-              ),
-              _buildGoalItem(
-                icon: Icons.water_drop,
-                value: '1.5',
-                unit: 'liters',
-                progress: 0.5,
-              ),
-            ],
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.8),
+              height: 1.5,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildGoalItem({
+  Widget _buildDailyGoals() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Daily Goals',
+            style: GoogleFonts.poppins(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 15),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue[700]!, Colors.blue[900]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blue[300]!.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildGoalProgress(
+                  icon: Icons.local_fire_department,
+                  value: 0.7,
+                  label: '850 kcal',
+                  color: Colors.orange[400]!,
+                ),
+                _buildGoalProgress(
+                  icon: Icons.fitness_center,
+                  value: 0.65,
+                  label: '4/6 exercises',
+                  color: Colors.green[400]!,
+                ),
+                _buildGoalProgress(
+                  icon: Icons.water_drop,
+                  value: 0.5,
+                  label: '1.5L water',
+                  color: Colors.blue[400]!,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoalProgress({
     required IconData icon,
-    required String value,
-    required String unit,
-    required double progress,
+    required double value,
+    required String label,
+    required Color color,
   }) {
     return Column(
       children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 60,
-              height: 60,
-              child: CircularProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.white24,
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                strokeWidth: 3,
+        SizedBox(
+          height: 64,
+          width: 64,
+          child: Stack(
+            children: [
+              ShaderMask(
+                shaderCallback: (rect) {
+                  return SweepGradient(
+                    startAngle: 0.0,
+                    endAngle: 3.14 * 2,
+                    stops: [value, value],
+                    center: Alignment.center,
+                    colors: [color, Colors.white.withOpacity(0.2)],
+                  ).createShader(rect);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 4,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            Icon(icon, color: Colors.white, size: 24),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+              Center(
+                child: Icon(icon, color: Colors.white, size: 24),
+              ),
+            ],
           ),
         ),
+        const SizedBox(height: 10),
         Text(
-          unit,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
+          label,
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 12,
           ),
         ),
       ],
@@ -175,199 +254,174 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildTodayWorkout(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Today\'s Workout',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('View Plan'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 15),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.fitness_center,
-                      color: Colors.blue[400],
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Upper Body Strength',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '8 exercises · 40 min',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text('Start'),
-                  ),
-                ],
+              Text(
+                'Today\'s Workout',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNutritionOverview() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Nutrition Overview',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 15),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNutrientProgress(
-                nutrient: 'Protein',
-                current: 65,
-                target: 120,
-                color: Colors.red[400]!,
-              ),
-              _buildNutrientProgress(
-                nutrient: 'Carbs',
-                current: 180,
-                target: 240,
-                color: Colors.green[400]!,
-              ),
-              _buildNutrientProgress(
-                nutrient: 'Fats',
-                current: 45,
-                target: 60,
-                color: Colors.blue[400]!,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNutrientProgress({
-    required String nutrient,
-    required int current,
-    required int target,
-    required Color color,
-  }) {
-    final progress = current / target;
-    return Column(
-      children: [
-        SizedBox(
-          width: 60,
-          height: 60,
-          child: Stack(
-            children: [
-              CircularProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.grey[200],
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-                strokeWidth: 8,
-              ),
-              Center(
+              TextButton(
+                onPressed: () {},
                 child: Text(
-                  '${(progress * 100).round()}%',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  'View Plan',
+                  style: GoogleFonts.poppins(color: Colors.blue),
                 ),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          nutrient,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
+          const SizedBox(height: 15),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[200]!,
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue[400]!, Colors.blue[600]!],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.fitness_center,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Upper Body Strength',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '8 exercises · 40 min',
+                            style: GoogleFonts.poppins(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue[400]!, Colors.blue[600]!],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue[300]!.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        'Start',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        Text(
-          '$current/$target g',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStats() {
+    return Container(
+      height: 100,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: ListView(
+        physics: const BouncingScrollPhysics(),
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        children: [
+          _buildQuickStatCard('Steps', '8,439', Icons.directions_walk),
+          _buildQuickStatCard('Heart Rate', '72 bpm', Icons.favorite),
+          _buildQuickStatCard('Sleep', '7h 30m', Icons.nightlight_round),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStatCard(String label, String value, IconData icon) {
+    return Container(
+      width: 140,
+      margin: const EdgeInsets.only(right: 15),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey[200]!,
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.blue[400], size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
