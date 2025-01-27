@@ -19,12 +19,10 @@ class MockWorkoutDetailsRepository implements WorkoutDetailsRepository {
             description:
                 "A detailed description of the exercise and tips for correct form.",
             duration: id == 1 ? 25 : 12,
-            imageUrl: id == 1
-                ? "/exercises/bulgariansplitsquat.jpg"
-                : "/exercises/russiantwists.jpg",
-            videoUrl: id == 1
-                ? "https://example.com/calf-raises-demo"
-                : "https://example.com/handstand-push-ups-demo",
+            imageUrl:
+                "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1470&auto=format&fit=crop",
+            videoUrl:
+                "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
             technique: id == 1 ? "circuit" : "superset",
             caloriesBurned: id == 1 ? 178 : 78,
             notes: "Additional notes or tips specific to this workout."))

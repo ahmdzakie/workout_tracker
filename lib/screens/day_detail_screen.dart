@@ -3,6 +3,7 @@ import 'package:workout_tracker/models/workout_details.dart';
 import 'package:workout_tracker/repositories/mock_workout_details_repository.dart';
 import 'package:workout_tracker/repositories/workout_details_repository_impl.dart';
 import 'package:workout_tracker/services/api/workout_api_client.dart';
+import 'package:workout_tracker/widgets/video_player_widget.dart';
 import 'package:workout_tracker/services/cache/workout_details_cache.dart';
 import 'package:workout_tracker/services/service_locator.dart';
 import '../models/workout_plan.dart';
@@ -262,17 +263,7 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           childrenPadding: const EdgeInsets.all(20),
-          leading: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue[50],
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Icon(
-              Icons.fitness_center,
-              color: Colors.blue[400],
-            ),
-          ),
+          leading: _buildExerciseImage(details.imageUrl),
           title: Text(
             details.name,
             style: GoogleFonts.poppins(
@@ -288,6 +279,9 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
             ),
           ),
           children: [
+            if (details.imageUrl.isNotEmpty) _buildFullImage(details.imageUrl),
+            if (details.videoUrl.isNotEmpty)
+              VideoPlayerWidget(videoUrl: details.videoUrl),
             _buildExerciseDetail('Category', details.category),
             _buildExerciseDetail('Equipment', details.equipment),
             _buildExerciseDetail(
@@ -313,6 +307,43 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExerciseImage(String imageUrl) {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(20),
+        image: imageUrl.isNotEmpty
+            ? DecorationImage(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+              )
+            : null,
+      ),
+      child: imageUrl.isEmpty
+          ? Icon(
+              Icons.fitness_center,
+              color: Colors.blue[400],
+            )
+          : null,
+    );
+  }
+
+  Widget _buildFullImage(String imageUrl) {
+    return Container(
+      height: 200,
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        image: DecorationImage(
+          image: NetworkImage(imageUrl),
+          fit: BoxFit.cover,
         ),
       ),
     );
