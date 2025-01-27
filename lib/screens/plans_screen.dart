@@ -30,24 +30,11 @@ class _PlansScreenState extends State<PlansScreen> {
   Future<void> _loadCurrentPlan() async {
     try {
       final plan = await workoutPlanRepository.getCurrentPlan();
-      print('Workout Plan Details:');
-      print('Plan Name: ${plan.name}');
-      print('Duration: ${plan.description} weeks');
-      print('\nWorkouts:');
-      var workout = plan.monday;
-      //for (var workout in plan.friday) {
-      print('\n${workout.name}:');
-      print('Exercises:');
-      for (var exercise in workout.exercises) {
-        print(
-            '- ${exercise.technique}: ${exercise.sets} sets, ${exercise.reps} reps');
-      }
-      //}
       setState(() {
         currentPlan = plan;
         isLoading = false;
       });
-    } on Exception catch (error) {
+    } catch (error) {
       setState(() {
         isLoading = false;
       });
@@ -204,14 +191,9 @@ class _PlansScreenState extends State<PlansScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              dayPlan.name,
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '${dayPlan.exercises.length} exercises',
+                              dayPlan.exercises.isNotEmpty
+                                  ? '${dayPlan.exercises.length} exercises'
+                                  : 'Rest Day',
                               style: GoogleFonts.poppins(
                                 color: Colors.grey[600],
                                 fontSize: 14,

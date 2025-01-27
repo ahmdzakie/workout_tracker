@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/models/workout_details.dart';
 import 'package:workout_tracker/repositories/mock_workout_details_repository.dart';
+import 'package:workout_tracker/repositories/workout_details_repository_impl.dart';
+import 'package:workout_tracker/services/api/workout_api_client.dart';
 import 'package:workout_tracker/services/cache/workout_details_cache.dart';
 import 'package:workout_tracker/services/service_locator.dart';
 import '../models/workout_plan.dart';
@@ -20,7 +22,9 @@ class DayDetailScreen extends StatefulWidget {
 
 class _DayDetailScreenState extends State<DayDetailScreen> {
   final _cache = getIt<WorkoutDetailsCache>();
-  final _repository = MockWorkoutDetailsRepository(); // Using mock repository
+  final _repository =
+      MockWorkoutDetailsRepository(); //WorkoutDetailsRepositoryImpl(WorkoutApiClient());
+
   late Future<void> _workoutDetailsFuture;
 
   @override
@@ -109,7 +113,7 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
           centerTitle: false,
           titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
           title: Text(
-            widget.dayPlan.name,
+            'Workout Details',
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
             ),
@@ -290,7 +294,6 @@ class _DayDetailScreenState extends State<DayDetailScreen> {
                 'Target Muscles', details.targetMuscles.join(', ')),
             _buildExerciseDetail('Difficulty', details.difficultyLevel),
             _buildExerciseDetail('Technique', exercise.technique),
-            _buildExerciseDetail('RPE', exercise.rpe.toString()),
             _buildExerciseDetail('Rest Time', '${exercise.restTime} seconds'),
             if (details.description.isNotEmpty) ...[
               const SizedBox(height: 15),

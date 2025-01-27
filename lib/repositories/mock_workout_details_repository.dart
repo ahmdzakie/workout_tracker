@@ -5,25 +5,29 @@ class MockWorkoutDetailsRepository implements WorkoutDetailsRepository {
   @override
   Future<List<WorkoutDetails>> getWorkoutDetails(List<int> workoutIds) async {
     await Future.delayed(const Duration(milliseconds: 800));
-    
-    return Future.value(workoutIds.map((id) => WorkoutDetails(
-      id: id,
-      name: "Bench Press",
-      category: "Strength",
-      equipment: "Barbell",
-      targetMuscles: ["Chest", "Triceps", "Shoulders"],
-      difficultyLevel: "Intermediate",
-      description: "Classic compound movement for chest development",
-      sets: 3,
-      reps: 12,
-      restTime: 90,
-      rpe: 8,
-      duration: 300,
-      imageUrl: "",
-      videoUrl: "",
-      technique: "Control the weight throughout the movement",
-      caloriesBurned: 150,
-      note: "Keep back flat on bench"
-    )).toList());
+
+    return workoutIds
+        .map((id) => WorkoutDetails(
+            id: id,
+            name: id == 1 ? "Leg Press" : "Bulgarian Split Squat",
+            category: id == 1 ? "mobility" : "strength",
+            equipment: "jump rope",
+            targetMuscles: id == 1
+                ? ["biceps", "triceps", "glutes"]
+                : ["quads", "hamstrings", "glutes"],
+            difficultyLevel: id == 1 ? "beginner" : "intermediate",
+            description:
+                "A detailed description of the exercise and tips for correct form.",
+            duration: id == 1 ? 25 : 12,
+            imageUrl: id == 1
+                ? "/exercises/bulgariansplitsquat.jpg"
+                : "/exercises/russiantwists.jpg",
+            videoUrl: id == 1
+                ? "https://example.com/calf-raises-demo"
+                : "https://example.com/handstand-push-ups-demo",
+            technique: id == 1 ? "circuit" : "superset",
+            caloriesBurned: id == 1 ? 178 : 78,
+            notes: "Additional notes or tips specific to this workout."))
+        .toList();
   }
 }

@@ -1,98 +1,72 @@
-  import '../../models/workout_plan.dart';
-  import '../../repositories/workout_plan_repository.dart';
+import '../../models/workout_plan.dart';
+import '../../repositories/workout_plan_repository.dart';
 
-  enum MuscleGroup {
-    UpperBody,
-    LowerBody,
-    Core,
-    FullBody
-  }
+enum MuscleGroup { UpperBody, LowerBody, Core, FullBody }
 
-  enum Equipment {
-    Barbell,
-    Dumbbells,
-    Machines,
-    Bodyweight,
-    Other
-  }
+enum Equipment { Barbell, Dumbbells, Machines, Bodyweight, Other }
 
-  enum Category {
-    Strength,
-    Cardio,
-    Flexibility,
-    Balance
-  }
+enum Category { Strength, Cardio, Flexibility, Balance }
 
-  enum SkillLevel {
-    Beginner,
-    Intermediate,
-    Advanced,
-    Expert
-  }
+enum SkillLevel { Beginner, Intermediate, Advanced, Expert }
+
 class MockWorkoutPlanRepository implements WorkoutPlanRepository {
-    final WorkoutPlan _mockWorkoutPlan = WorkoutPlan(
-    id: 1,
-    name: "Strength Building Program",
-    description: "12-week progressive strength training",
+  final WorkoutPlan _mockWorkoutPlan = WorkoutPlan(
+    id: 3,
+    name: "Good Work",
+    description: "This is a workout plan.",
+    startDate: "2025-01-17",
+    endDate: "2025-02-14",
+    status: "completed",
     monday: DayPlan(
-        name: "Monday",
-        exercises: [
-        Exercise(
-            workoutId: 1,
-            sets: 4,
-            reps: 12,
-            technique: "Standard",
-            rpe: 8,
-            notes: "Keep shoulders retracted",
-            restTime: 90,
-        ),
-        ],
+      exercises: [],
     ),
     tuesday: DayPlan(
-        name: "Tuesday",
-        exercises: [
+      exercises: [
         Exercise(
-            workoutId: 2,
-            sets: 5,
-            reps: 10,
-            technique: "Controlled",
-            rpe: 7,
-            notes: "Focus on form",
-            restTime: 60,
+          workoutId: 1,
+          sets: 2,
+          reps: 19,
+          technique: "circuit",
+          restTime: 94,
+          notes: "Additional notes or tips specific to this workout.",
         ),
-        ],
+        Exercise(
+          workoutId: 2,
+          sets: 5,
+          reps: 11,
+          technique: "superset",
+          restTime: 76,
+          notes: "Additional notes or tips specific to this workout.",
+        ),
+      ],
     ),
     wednesday: DayPlan(
-        name: "Wednesday",
-        exercises: [],
+      exercises: [
+        Exercise(
+          workoutId: 1,
+          sets: 2,
+          reps: 19,
+          technique: "circuit",
+          restTime: 94,
+          notes: "Additional notes or tips specific to this workout.",
+        ),
+      ],
     ),
-    thursday: DayPlan(
-        name: "Thursday",
-        exercises: [],
-    ),
-    friday: DayPlan(
-        name: "Friday",
-        exercises: [],
-    ),
-    saturday: DayPlan(
-        name: "Saturday",
-        exercises: [],
-    ),
-    sunday: DayPlan(
-        name: "Sunday",
-        exercises: [],
-    ),
-    );
+    thursday: DayPlan(exercises: []),
+    friday: DayPlan(exercises: []),
+    saturday: DayPlan(exercises: []),
+    sunday: DayPlan(exercises: []),
+  );
 
-    @override
-    Future<WorkoutPlan> getCurrentPlan() async {
+  @override
+  Future<WorkoutPlan> getCurrentPlan() async {
     await Future.delayed(const Duration(milliseconds: 800));
     return _mockWorkoutPlan;
-    }
+  }
 
-    @override
-    Future<List<WorkoutPlan>> getPreviousPlans() async {
+  @override
+  Future<List<WorkoutPlan>> getPreviousPlans() async {
     await Future.delayed(const Duration(milliseconds: 500));
     return [_mockWorkoutPlan];
-    }
+  }
 }
