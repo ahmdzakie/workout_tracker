@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/workout_plan.dart';
 import '../repositories/workout_plan_repository.dart';
+import '../repositories/workout_plan_repository_impl.dart';
+import '../services/api/workout_plan_api_client.dart';
 import '../repositories/mock_workout_plan_repository.dart';
 import 'day_detail_screen.dart';
 
@@ -14,6 +16,7 @@ class PlansScreen extends StatefulWidget {
 
 class _PlansScreenState extends State<PlansScreen> {
   final WorkoutPlanRepository workoutPlanRepository =
+      // WorkoutPlanRepositoryImpl(WorkoutPlanApiClient());
       MockWorkoutPlanRepository();
   WorkoutPlan? currentPlan;
   bool isLoading = true;
@@ -27,6 +30,19 @@ class _PlansScreenState extends State<PlansScreen> {
   Future<void> _loadCurrentPlan() async {
     try {
       final plan = await workoutPlanRepository.getCurrentPlan();
+      print('Workout Plan Details:');
+      print('Plan Name: ${plan.name}');
+      print('Duration: ${plan.description} weeks');
+      print('\nWorkouts:');
+      var workout = plan.monday;
+      //for (var workout in plan.friday) {
+      print('\n${workout.name}:');
+      print('Exercises:');
+      for (var exercise in workout.exercises) {
+        print(
+            '- ${exercise.technique}: ${exercise.sets} sets, ${exercise.reps} reps');
+      }
+      //}
       setState(() {
         currentPlan = plan;
         isLoading = false;

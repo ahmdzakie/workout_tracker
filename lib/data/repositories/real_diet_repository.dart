@@ -1,3 +1,7 @@
+import 'diet_repository.dart';
+import '../services/diet_api_service.dart';
+import '../models/diet_plan.dart';
+
 class RealDietRepository implements DietRepository {
   final DietApiService _apiService;
 

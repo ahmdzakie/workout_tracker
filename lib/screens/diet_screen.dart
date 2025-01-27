@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:workout_tracker/data/services/diet_api_service.dart';
+import 'package:workout_tracker/data/services/real_diet_api_service.dart';
 import 'meal_details_screen.dart';
 import '../data/models/diet_plan.dart';
 import '../data/repositories/diet_repository.dart';
-import '../data/repositories/mock_diet_repository.dart';
+//import '../data/repositories/mock_diet_repository.dart';
+import '../data/repositories/real_diet_repository.dart';
 
 class DietScreen extends StatefulWidget {
   const DietScreen({Key? key}) : super(key: key);
@@ -13,12 +16,16 @@ class DietScreen extends StatefulWidget {
 }
 
 class _DietScreenState extends State<DietScreen> {
-  final DietRepository _dietRepository = MockDietRepository();
+  // final DietApiService _dietApiService = RealDietApiService();
+  late final DietRepository _dietRepository;
+  // final DietRepository _dietRepository =
+  // RealDietRepository(_dietApiService); //MockDietRepository();
   late Future<DietPlan> _dietPlan;
 
   @override
   void initState() {
     super.initState();
+    _dietRepository = RealDietRepository(RealDietApiService());
     _dietPlan = _dietRepository.getDietPlan();
   }
 
@@ -182,17 +189,17 @@ class _DietScreenState extends State<DietScreen> {
         children: [
           _buildMacroIndicator(
             'Protein',
-            plan.targetMacros.protein,
+            plan.targetProtein,
             Colors.red[400]!,
           ),
           _buildMacroIndicator(
             'Carbs',
-            plan.targetMacros.carbs,
+            plan.targetCarbs,
             Colors.green[400]!,
           ),
           _buildMacroIndicator(
             'Fats',
-            plan.targetMacros.fats,
+            plan.targetFat,
             Colors.blue[400]!,
           ),
         ],
